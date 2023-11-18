@@ -1,8 +1,8 @@
 package com.evan.HTTPCatEmailer.tasks;
 
+import com.evan.HTTPCatEmailer.configurations.EmailToConfiguration;
 import com.evan.HTTPCatEmailer.service.CatService;
 import com.evan.HTTPCatEmailer.service.EmailService;
-import com.evan.HTTPCatEmailer.tools.ProfileManager;
 import jakarta.mail.MessagingException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,16 +21,16 @@ public class EmailTasks {
 
     private final CatService catService;
 
-    private  final ProfileManager profileManager;
+    private final EmailToConfiguration emailToConfiguration;
 
     private static final Logger log = LoggerFactory.getLogger(EmailTasks.class);
 
     private static final SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
 
-    public EmailTasks(EmailService emailService, CatService catService, ProfileManager profileManager) {
+    public EmailTasks(EmailService emailService, CatService catService, EmailToConfiguration emailToConfiguration) {
         this.emailService = emailService;
         this.catService = catService;
-        this.profileManager = profileManager;
+        this.emailToConfiguration = emailToConfiguration;
     }
 
     @Scheduled(fixedRate = 60000)
@@ -53,7 +53,7 @@ public class EmailTasks {
         imageBytes.subscribe(
                 imageData -> {
                     log.info("Sending attachment email...");
-                    emailService.sendAttachmentMessage(profileManager.getActiveEmailUsername(),
+                    emailService.sendAttachmentMessage(emailToConfiguration.getUsername(),
                             randomStatusCodeMono,
                             "",
                             Mono.just(imageData)).subscribe();

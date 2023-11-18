@@ -11,10 +11,6 @@ public class HttpCatEmailerApplication {
 
 	public static void main(String[] args) {
 		SpringApplication application = new SpringApplication(HttpCatEmailerApplication.class);
-		Scanner scanner = new Scanner(System.in);
-		System.out.println("Select active profile: ");
-		String activeProfile = scanner.nextLine();
-		application.setAdditionalProfiles(activeProfile);
 		application.run(args);
 	}
 }

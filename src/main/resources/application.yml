@@ -1,0 +1,36 @@
+server:
+  port: 8081
+
+spring:
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: http.cat.clone.test@gmail.com
+    password: qpgk mzxs jlok dyty
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
+email:
+  to: http.cat.clone.test@gmail.com
+
+---
+spring:
+  config:
+    activate:
+      on-profile: brad
+
+email:
+  to: rammelbrad@gmail.com
+
+---
+spring:
+  config:
+    activate:
+      on-profile: evan
+
+email:
+  to: http.cat.clone.test.2@gmail.com
