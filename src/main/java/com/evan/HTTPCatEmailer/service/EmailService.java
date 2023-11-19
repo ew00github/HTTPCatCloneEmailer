@@ -17,7 +17,7 @@ public class EmailService {
     private final JavaMailSender mailSender;
 
     @Autowired
-    public EmailService(JavaMailSender mailSender){
+    public EmailService(JavaMailSender mailSender) {
         this.mailSender = mailSender;
     }
 
@@ -30,23 +30,19 @@ public class EmailService {
         mailSender.send(message);
     }
 
-    public Mono<Void> sendAttachmentMessage(String to, Mono<String> subject, String text, Mono<byte[]> imageAttachment) {
-        return subject.flatMap(subjectString -> {
-            return imageAttachment.flatMap(imageData -> {
-                MimeMessage message = mailSender.createMimeMessage();
-                try {
-                    MimeMessageHelper helper = new MimeMessageHelper(message, true);
-                    helper.setFrom("noreply@HttpCatClone.org");
-                    helper.setTo(to);
-                    helper.setSubject(subjectString);
-                    helper.setText(text);
-                    helper.addAttachment("statusImage", new ByteArrayResource(imageData), "image/jpeg");
-                    mailSender.send(message);
-                    return Mono.empty();
-                } catch (MessagingException e) {
-                    return Mono.error(e);
-                }
-            });
-        });
+    public Mono<Void> sendAttachmentMessage(String to, String subject, String text, byte[] imageAttachment) throws MessagingException {
+        try {
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true);
+            helper.setFrom("noreply@HttpCatClone.org");
+            helper.setTo(to);
+            helper.setSubject(subject);
+            helper.setText(text);
+            helper.addAttachment("statusImage", new ByteArrayResource(imageAttachment), "image/jpeg");
+            mailSender.send(message);
+            return Mono.empty();
+        } catch(MessagingException e){
+            return Mono.error(e);
+        }
     }
 }
