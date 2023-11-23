@@ -1,12 +1,12 @@
 package com.evan.HTTPCatEmailer.tasks;
 
+import com.evan.HTTPCatEmailer.model.HttpStatus;
 import com.evan.HTTPCatEmailer.service.CatService;
 import com.evan.HTTPCatEmailer.service.EmailService;
 import com.evan.HTTPCatEmailer.tools.ProfileManager;
 import jakarta.mail.MessagingException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
@@ -47,18 +47,16 @@ public class EmailTasks {
     public void sendRandomStatusAsAttachment() throws MessagingException {
         Random random = new Random();
         Long randomId = (long) random.nextInt(71) + 1;
-        Mono<ResponseEntity<byte[]>> response = catService.requestImageFromCatCloneId(randomId);
-        Mono<byte[]> imageBytes = catService.convertMonoCatImageToMonoByteArray(response);
-        Mono<String> randomStatusCodeMono = catService.requestStatusFromCatCloneId(randomId);
-        imageBytes.subscribe(
-                imageData -> {
-                    log.info("Sending attachment email...");
-                    emailService.sendAttachmentMessage(profileManager.getActiveEmailUsername(),
-                            randomStatusCodeMono,
-                            "",
-                            Mono.just(imageData)).subscribe();
-                },
-                error -> log.error("Error obtaining image bytes.", error)
-        );
+        Mono<HttpStatus> responseMono = catService.requestHttpStatusFromCatCloneId(randomId);
+        responseMono.flatMap(responseStatus -> {
+           String status = responseStatus.getStatus();
+           byte[] imageData = responseStatus.getImage();
+            try {
+                return emailService.sendAttachmentMessage(profileManager.getActiveEmailUsername(), status, "", imageData);
+            } catch (MessagingException e) {
+                log.info("Error Sending Attachment Message");
+                throw new RuntimeException(e);
+            }
+        }).subscribe();
     }
 }

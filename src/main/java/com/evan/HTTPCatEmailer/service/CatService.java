@@ -1,9 +1,6 @@
 package com.evan.HTTPCatEmailer.service;
 
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import com.evan.HTTPCatEmailer.model.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
@@ -17,38 +14,10 @@ public class CatService {
         this.webClient = webClient;
     }
 
-    public Mono<String> requestStatusFromCatCloneId(Long id){
+    public Mono<HttpStatus> requestHttpStatusFromCatCloneId(Long id){
         return webClient.get()
-                .uri("http://localhost:8080/catAPI/sendStatusCode/id/" + id)
+                .uri("http://localhost:8080/catAPI/sendHttpStatus/id/" + id)
                 .retrieve()
-                .bodyToMono(String.class);
-    }
-
-    public Mono<ResponseEntity<byte[]>> requestImageFromCatCloneId(Long id){
-        Mono<byte[]> imageBytes =  webClient.get()
-                .uri("http://localhost:8080/catAPI/sendImage/id/" + id)
-                .retrieve()
-                .bodyToMono(byte[].class);
-        return imageBytes.map(catImage -> {
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.IMAGE_JPEG);
-            return new ResponseEntity<>(catImage, headers, org.springframework.http.HttpStatus.OK);
-        });
-    }
-
-    public Mono<ResponseEntity<byte[]>> requestImageFromCatCloneStatus(String status){
-        Mono<byte[]> imageBytes =  webClient.get()
-                .uri("http://localhost:8080/catAPI/sendImage/status/" + status)
-                .retrieve()
-                .bodyToMono(byte[].class);
-        return imageBytes.map(catImage -> {
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.IMAGE_JPEG);
-            return new ResponseEntity<>(catImage, headers, org.springframework.http.HttpStatus.OK);
-        });
-    }
-
-    public Mono<byte[]> convertMonoCatImageToMonoByteArray(Mono<ResponseEntity<byte[]>> monoImage) {
-        return monoImage.map(HttpEntity::getBody);
+                .bodyToMono(HttpStatus.class);
     }
 }
