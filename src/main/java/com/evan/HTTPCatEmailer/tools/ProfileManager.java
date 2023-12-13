@@ -9,7 +9,7 @@ public class ProfileManager {
 
     private final Environment environment;
 
-    @Value("${spring.mail.evan.username}")
+    @Value("${spring.mail.brad.username}")
     private String usernameBrad;
 
     @Value("${spring.mail.evan.username}")
